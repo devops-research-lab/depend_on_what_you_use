@@ -2,6 +2,7 @@ load("@rules_cc//cc:action_names.bzl", "CPP_COMPILE_ACTION_NAME")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain", "use_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("//src/toolchain_headers:providers.bzl", "DwyuCcToolchainHeadersInfo")
+load("//src/utils:utils.bzl", "print_cc_toolchain")
 
 # We compare the compiler name via substring matching to the compiler specified by the toolchain.
 # Structure: {<compiler_name>: [<options_for_specifying_include_paths>]}
@@ -67,10 +68,15 @@ def _get_command_line_includes(ctx, cc_toolchain):
     [0]: https://bazel.build/rules/lib/toplevel/cc_common#create_cc_toolchain_config_info
     """
     compile_cmd = _create_minimal_compile_cmd(ctx, cc_toolchain)
+
+    # buildifier: disable=print
+    print("COMPILE_CMD", compile_cmd)
     return extract_include_paths(compile_cmd, cc_toolchain.compiler)
 
 def _gather_toolchain_headers_impl(ctx):
     cc_toolchain = find_cc_toolchain(ctx)
+
+    print_cc_toolchain(cc_toolchain)
 
     # Relevant include paths on top of 'CcToolchainInfo.built_in_include_directories'
     toolchain_include_directories = _get_command_line_includes(ctx, cc_toolchain)
